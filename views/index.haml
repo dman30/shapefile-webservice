@@ -16,7 +16,7 @@
     }
     #map {
       width: 1024px;
-      height: 512px;
+      height: 800px;
       margin: 0;
       padding: 0;
       border: 0;
@@ -56,6 +56,8 @@
     }
 %body
   %h2 Deutsche PLZ Gebiete
+  #spinner
+    %img{id: 'all-spinner', src: 'openlayers/img/activity.gif'}
   #map
   #output
   #config
@@ -64,8 +66,8 @@
         %input{type:'radio', name:'type', value: 'none', id: 'noneToggle', onclick: 'polygonControl.deactivate(); measureControl.toggleControl(this);', checked:'checked'}
         %label{ for:'noneToggle' }navigate
       %li
-        %input{type:'radio', name:'polygonToggle', onclick: 'polygonControl.activate(); measureControl.toggleControl(this);'}
+        %input{type:'radio', name:'type', id: 'polygonToggle', onclick: 'polygonControl.activate(); measureControl.toggleControl(this);'}
         %label{for: 'polygonToggle'}draw polygone
       %li
-        %input{ type:'radio', name:'type', value:'line', id:'lineToggle', onclick:'measureControl.toggleControl(this);' }
+        %input{ type:'radio', name:'type', value:'line', id:'lineToggle', onclick:'polygonControl.deactivate(); measureControl.toggleControl(this);' }
         %label{ for:'lineToggle' }measure distance

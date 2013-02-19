@@ -30,57 +30,61 @@ var shapeFile = {
     // load the shapefile
     var theUrl = 'openlayers/plz/post_pl';
     getOpenLayersFeatures(theUrl, function (fs) {
-	// reproject features
-	// this is ordinarily done by the format object, but since we're adding features manually we have to do it.
-	var fsLen = fs.length;
-	var inProj = new OpenLayers.Projection('EPSG:4326');
-	var outProj = new OpenLayers.Projection('EPSG:3857');
-	for (var i = 0; i < fsLen; i++) {
-	    fs[i].geometry = fs[i].geometry.transform(inProj, outProj);
-	}
-	shpLayer.addFeatures(fs);
+      // reproject features
+      // this is ordinarily done by the format object, but since we're adding features manually we have to do it.
+      var fsLen = fs.length;
+      var inProj = new OpenLayers.Projection('EPSG:4326');
+      var outProj = new OpenLayers.Projection('EPSG:3857');
+      for (var i = 0; i < fsLen; i++) {
+          fs[i].geometry = fs[i].geometry.transform(inProj, outProj);
+      }
+      shpLayer.addFeatures(fs);
+      $('all-spinner').style.visibility ='hidden';
     });
-},
+  },
 
-// Needed only for interaction, not for the display.
-onPopupClose: function(evt) {
-    // 'this' is the popup.
-    var feature = this.feature;
-    if (feature.layer) { // The feature is not destroyed
-	selectControl.unselect(feature);
-    } else { // After "moveend" or "refresh" events on POIs layer all
-	//     features have been destroyed by the Strategy.BBOX
-	this.destroy();
-    }
-},
+  // Needed only for interaction, not for the display.
+  onPopupClose: function(evt) {
+      // 'this' is the popup.
+      var feature = this.feature;
+      if (feature.layer) { // The feature is not destroyed
+    selectControl.unselect(feature);
+      } else { // After "moveend" or "refresh" events on POIs layer all
+    //     features have been destroyed by the Strategy.BBOX
+    this.destroy();
+      }
+  },
 
-onFeatureSelect: function(evt) {
-    feature = evt.feature;
-    var table = '<table>';
-    for (var attr in feature.attributes.values) {
-	table += '<tr><td>' + attr + '</td><td>' + feature.attributes.values[attr] + '</td></tr>';
-    }
-    table += '</table>';
-    popup = new OpenLayers.Popup.FramedCloud("featurePopup",
-					     feature.geometry.getBounds().getCenterLonLat(),
-					     new OpenLayers.Size(100,100), table, null, true);//, this.onPopupClose);
-    feature.popup = popup;
-    popup.feature = feature;
-    map.addPopup(popup, true);
-},
-onFeatureUnSelect: function(evt) {
-    feature = evt.feature;
-    if (feature.popup) {
-	popup.feature = null;
-	map.removePopup(feature.popup);
-	feature.popup.destroy();
-	feature.popup = null;
-    }
-}};
+  onFeatureSelect: function(evt) {
+      feature = evt.feature;
+      var table = '<table>';
+      for (var attr in feature.attributes.values) {
+        table += '<tr><td>' + attr + '</td><td>' + feature.attributes.values[attr] + '</td></tr>';
+      }
+      table += '</table>';
+      popup = new OpenLayers.Popup.FramedCloud("featurePopup",
+                 feature.geometry.getBounds().getCenterLonLat(),
+                 new OpenLayers.Size(100,100), table, null, true);//, this.onPopupClose);
+      feature.popup = popup;
+      popup.feature = feature;
+      // map.addPopup(popup, true);
+  },
+  onFeatureUnSelect: function(evt) {
+      feature = evt.feature;
+      if (feature.popup) {
+    popup.feature = null;
+    map.removePopup(feature.popup);
+    feature.popup.destroy();
+    feature.popup = null;
+      }
+  }
+};
 
 // polygoncontrol
 var polygonControl = {
+
   init: function(){
+
     var wmsLayer = new OpenLayers.Layer.WMS( "OpenLayers WMS",
         "http://vmap0.tiles.osgeo.org/wms/vmap0?", {layers: 'basic'});
 
