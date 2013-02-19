@@ -15,6 +15,9 @@ get '/app.js' do
   coffee :app
 end
 
+# get '/plz' do
+#   File.read(File.join('public/openlayers/plz/post_pl.shp'))
+# end
 
 get '/lonlat2plz/:lat/:lon' do
   Converter.latlon2plz params[:lon].to_f, params[:lat].to_f

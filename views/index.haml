@@ -1,12 +1,71 @@
 !!!5
 %head
   %script{:type => "text/javascript", :src  => "openlayers/OpenLayers.js"}
+  %script{:type => "text/javascript", :src  => "openlayers/binaryajax.js"}
+  %script{:type => "text/javascript", :src  => "openlayers/binarywrapper.js"}
+  %script{:type => "text/javascript", :src  => "openlayers/shapefile.js"}
+  %script{:type => "text/javascript", :src  => "openlayers/dbf.js"}
+  %script{:type => "text/javascript", :src  => "openlayers/ol_shapefile.js"}
+  %script{:type => "text/javascript", :src  => "openlayers/shapefile_webservice.js"}
   :css
+    body {
+      background-color: #eee;
+      color: #000;
+      font: 12px sans-serif;
+      margin: 20px;
+    }
     #map {
-      width:600px;
-      height:900px;
+      width: 1024px;
+      height: 512px;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      background-color: #9dc3e0;
+    }
+    a img {
+      border: 0;
+    }
+    p {
+        width: 512px;
+    }
+    #config {
+        margin-top: 1em;
+        width: 512px;
+        position: relative;
+        height: 8em;
+    }
+    #controls {
+        padding-left: 2em;
+        margin-left: 0;
+        width: 12em;
+    }
+    #controls li {
+        padding-top: 0.5em;
+        list-style: none;
+    }
+    #options {
+        font-size: 1em;
+        top: 0;
+        margin-left: 15em;
+        position: absolute;
     }
 
+    /* avoid pink tiles */
+    .olImageLoadError {
+        background-color: transparent !important;
+    }
 %body
+  %h2 Deutsche PLZ Gebiete
   #map
-  %script{:type => "text/javascript", :src  => "app.js"}
+  #output
+  #config
+    %ul#controls
+      %li
+        %input{type:'radio', name:'type', value: 'none', id: 'noneToggle', onclick: 'polygonControl.deactivate(); measureControl.toggleControl(this);', checked:'checked'}
+        %label{ for:'noneToggle' }navigate
+      %li
+        %input{type:'radio', name:'polygonToggle', onclick: 'polygonControl.activate(); measureControl.toggleControl(this);'}
+        %label{for: 'polygonToggle'}draw polygone
+      %li
+        %input{ type:'radio', name:'type', value:'line', id:'lineToggle', onclick:'measureControl.toggleControl(this);' }
+        %label{ for:'lineToggle' }measure distance
