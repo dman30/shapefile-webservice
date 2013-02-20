@@ -12,19 +12,22 @@ var map;
 var shapeFile = {
   init: function () {
     map = new OpenLayers.Map('map', {sphericalMercator: true});
-    var osm = new OpenLayers.Layer.OSM({sphericalMercator: true});
 
-    var shpLayer = new OpenLayers.Layer.Vector({projection: new OpenLayers.Projection('EPSG:4326')});
-    map.addLayers([osm, shpLayer]);
-    map.setCenter(new OpenLayers.LonLat(10.546875,50.625),3);
+    var shpLayer = new OpenLayers.Layer.Vector('vector',{
+      isBaseLayer: true
+    });
+    map.addLayers([shpLayer]);
+    var proj = new OpenLayers.Projection('EPSG:4326');
+    var point = new OpenLayers.LonLat(10.546875,51.200);
+    point.transform(proj, map.getProjectionObject());
+    map.setCenter(point,7);
 
     // Interaction; not needed for initial display.
-    selectControl = new OpenLayers.Control.SelectFeature(shpLayer);
+    selectControl = new OpenLayers.Control.SelectFeature(shpLayer, {multiple: true});
     map.addControl(selectControl);
     selectControl.activate();
     shpLayer.events.on({
         'featureselected': this.onFeatureSelect,
-        'featureunselected': this.onFeatureUnselect
     });
 
     // load the shapefile
@@ -35,49 +38,22 @@ var shapeFile = {
       var fsLen = fs.length;
       var inProj = new OpenLayers.Projection('EPSG:4326');
       var outProj = new OpenLayers.Projection('EPSG:3857');
-      for (var i = 0; i < fsLen; i++) {
-          fs[i].geometry = fs[i].geometry.transform(inProj, outProj);
-      }
+      // only needed if shapefile needs to be rendered over a Layer with
+      // spherical mercator
+      // for (var i = 0; i < 1000; i++) {
+      //     fs[i].geometry = fs[i].geometry.transform(inProj, outProj);
+      // }
       shpLayer.addFeatures(fs);
       $('all-spinner').style.visibility ='hidden';
     });
   },
 
-  // Needed only for interaction, not for the display.
-  onPopupClose: function(evt) {
-      // 'this' is the popup.
-      var feature = this.feature;
-      if (feature.layer) { // The feature is not destroyed
-    selectControl.unselect(feature);
-      } else { // After "moveend" or "refresh" events on POIs layer all
-    //     features have been destroyed by the Strategy.BBOX
-    this.destroy();
-      }
-  },
-
   onFeatureSelect: function(evt) {
       feature = evt.feature;
-      var table = '<table>';
-      for (var attr in feature.attributes.values) {
-        table += '<tr><td>' + attr + '</td><td>' + feature.attributes.values[attr] + '</td></tr>';
-      }
-      table += '</table>';
-      popup = new OpenLayers.Popup.FramedCloud("featurePopup",
-                 feature.geometry.getBounds().getCenterLonLat(),
-                 new OpenLayers.Size(100,100), table, null, true);//, this.onPopupClose);
-      feature.popup = popup;
-      popup.feature = feature;
-      // map.addPopup(popup, true);
+      var plzout = '';
+      plzout += '<li>' + feature.attributes.values['PLZ99'] + '  ' + feature.attributes.values['PLZORT99'] + '</li>';
+      document.getElementById('plz').innerHTML += plzout;
   },
-  onFeatureUnSelect: function(evt) {
-      feature = evt.feature;
-      if (feature.popup) {
-    popup.feature = null;
-    map.removePopup(feature.popup);
-    feature.popup.destroy();
-    feature.popup = null;
-      }
-  }
 };
 
 // polygoncontrol
@@ -156,17 +132,7 @@ var measureControl = {
       measureControls = {
           line: new OpenLayers.Control.Measure(
               OpenLayers.Handler.Path, {
-                  persist: true,
-                  handlerOptions: {
-                      layerOptions: {
-                          renderers: renderer,
-                          styleMap: styleMap
-                      }
-                  }
-              }
-          ),
-          polygon: new OpenLayers.Control.Measure(
-              OpenLayers.Handler.Polygon, {
+                  geodesic: true,
                   persist: true,
                   handlerOptions: {
                       layerOptions: {
@@ -187,8 +153,6 @@ var measureControl = {
           });
           map.addControl(control);
       }
-
-      // map.setCenter(new OpenLayers.LonLat(0, 0), 3);
 
       document.getElementById('noneToggle').checked = true;
   },
