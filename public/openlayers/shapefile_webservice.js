@@ -17,10 +17,20 @@ var shapeFile = {
       isBaseLayer: true
     });
     map.addLayers([shpLayer]);
+
     var proj = new OpenLayers.Projection('EPSG:4326');
-    var point = new OpenLayers.LonLat(10.546875,51.200);
+    var point = new OpenLayers.LonLat(10.5,51.1);
     point.transform(proj, map.getProjectionObject());
     map.setCenter(point,7);
+
+    // var markers = new OpenLayers.Layer.Markers('Markers');
+    // map.addLayer(markers);
+    // var size = new OpenLayers.Size(21,25);
+    // var offset = new OpenLayers.Pixel(-(size.w/2), -size.h);
+    // var icon = new OpenLayers.Icon('http://www.openlayers.org/dev/img/marker.png', size, offset);
+    // var berlin = (new OpenLayers.LonLat(13.408056, 52.518611));
+    // berlin.transform(proj, map.getProjectionObject());
+    // markers.addMarker(new OpenLayers.Marker(berlin,icon));
 
     // Interaction; not needed for initial display.
     selectControl = new OpenLayers.Control.SelectFeature(shpLayer, {multiple: true});
@@ -46,6 +56,7 @@ var shapeFile = {
       shpLayer.addFeatures(fs);
       $('all-spinner').style.visibility ='hidden';
     });
+
   },
 
   onFeatureSelect: function(evt) {
